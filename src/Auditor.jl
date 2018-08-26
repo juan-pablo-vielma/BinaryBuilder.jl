@@ -222,6 +222,7 @@ function check_dynamic_linkage(oh, prefix, bin_files;
         # Look at every dynamic link, and see if we should do anything about that link...
         libs = find_libraries(oh)
         ignored_libraries = String[]
+        all_ok = true                
         for libname in keys(libs)
             if should_ignore_lib(libname, oh)
                 push!(ignored_libraries, libname)
@@ -263,7 +264,7 @@ function check_dynamic_linkage(oh, prefix, bin_files;
                         if !silent
                             warn(io, strip(msg))
                         end
-                        return false
+                        all_ok = false
                     end
                 else
                     msg = replace("""
@@ -273,7 +274,7 @@ function check_dynamic_linkage(oh, prefix, bin_files;
                     if !silent
                         warn(io, strip(msg))
                     end
-                    return false
+                    all_ok = false
                 end
             elseif !startswith(libs[libname], prefix.path)
                 msg = replace("""
@@ -283,7 +284,7 @@ function check_dynamic_linkage(oh, prefix, bin_files;
                 if !silent
                     warn(io, strip(msg))
                 end
-                return false
+                all_ok = false
             end
         end
 
@@ -291,7 +292,7 @@ function check_dynamic_linkage(oh, prefix, bin_files;
             info(io, "Ignored system libraries $(join(ignored_libraries, ", "))")
         end
     end
-    return true
+    return all_ok
 end
 
 
